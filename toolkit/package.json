@@ -1,0 +1,12 @@
+{
+  "name": "sb-toolkit",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Sketchy Business animated video toolkit",
+  "dependencies": {
+    "@iconify-json/fluent-emoji-flat": "^1.2.6",
+    "@resvg/resvg-js": "^2.6.2",
+    "opentype.js": "^2.0.0",
+    "roughjs": "^4.6.6"
+  }
+}
