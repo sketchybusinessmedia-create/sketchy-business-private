@@ -39,8 +39,8 @@ module.exports = {
       f.pop(540, 470, 'THIS IS DAVE', 120, 0.1, { rot: -2, hl: oc(k(t, 0.4, 0.7)) });
       f.pop(720, 760, 'self-employed', 52, 1.1, { font: 'hand', c: OR, rot: -4 });
       if (t > 1.2) f.sticker('briefcase', 760, 900, 150, { scale: ob(k(t, 1.2, 1.5)), rot: 6 });
-      if (t > 2.3) { const p = oc(k(t, 2.3, 2.7)); f.circle(720, 1170, 360 * p, { w: 6, sy: 0.55, fill: DARK, fs: 'solid' }); f.circle(560, 1080, 30 * p, { w: 5 });
-        f.pop(720, 1170, 'tax return? LATER.', 52, 2.6, { font: 'hand' }); f.pop(870, 1090, 'z z z', 40, 3.0, { font: 'hand', c: GREY }); }
+      if (t > 2.3) { const p = oc(k(t, 2.3, 2.7)); f.circle(740, 1180, 400 * p, { w: 6, sy: 0.6, fill: DARK, fs: 'solid' }); f.circle(560, 1070, 30 * p, { w: 5 });
+        f.pop(740, 1150, 'tax return?', 50, 2.6, { font: 'hand' }); f.pop(740, 1215, 'LATER.', 54, 2.75, { font: 'hand', c: OR }); f.pop(900, 1020, 'z z z', 40, 3.0, { font: 'hand', c: GREY }); }
     },
     s1(f, t) { // "Big mistake. The deadline for your online Self Assessment is the thirty-first of January."
       if (t < 0.25) f.cam.x = 14 * Math.sin(t * 90);

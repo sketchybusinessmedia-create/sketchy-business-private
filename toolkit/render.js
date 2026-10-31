@@ -28,7 +28,7 @@ function drawClock(f, t) {
   // Tax in 60 countdown: stopwatch in the bottom-left counts 60 -> 0 across the whole video (export clock: true)
   const cx = 200, cy = 1420, R = 78, sc = ob(k(t, 0.2, 0.55));
   if (sc <= 0) return;
-  const left = Math.max(0, 1 - t / TOTAL), secs = Math.ceil(60 * left);
+  const CT = +process.env.CLOCK_TOTAL || TOTAL; const left = Math.max(0, 1 - t / CT), secs = Math.ceil(60 * left);
   const a0 = -Math.PI / 2, a1 = a0 + 2 * Math.PI * left;
   const arc = (a, b) => { const large = b - a > Math.PI ? 1 : 0; return `M${cx + R * Math.cos(a)} ${cy + R * Math.sin(a)} A${R} ${R} 0 ${large} 1 ${cx + R * Math.cos(b)} ${cy + R * Math.sin(b)}`; };
   f.add(`<g transform="translate(${cx} ${cy}) scale(${sc}) translate(${-cx} ${-cy})">`);
