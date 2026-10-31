@@ -7,10 +7,12 @@ const [scenesFile, timFile, formPng, outDir, flag, ...stillTimes] = process.argv
 const S = require(path.resolve(scenesFile)); const tim = JSON.parse(fs.readFileSync(timFile));
 fs.mkdirSync(outDir, { recursive: true });
 const TOTAL = tim[tim.length - 1][2];
-const FORM = 'data:image/png;base64,' + fs.readFileSync(formPng).toString('base64');
+// FORM_PNG may be '-' when the video has no form screenshot (e.g. Tax in 60)
+const HAS_FORM = formPng && formPng !== '-';
+const FORM = HAS_FORM ? 'data:image/png;base64,' + fs.readFileSync(formPng).toString('base64') : '';
 const { execSync } = require('child_process');
-const [fw, fh] = execSync(`python3 -c "from PIL import Image;im=Image.open('${formPng}');print(im.size[0],im.size[1])"`).toString().trim().split(' ').map(Number);
-const swipeInto = new Set(['s0', ...(S.swipes || [])]);
+const [fw, fh] = HAS_FORM ? execSync(`python3 -c "from PIL import Image;im=Image.open('${formPng}');print(im.size[0],im.size[1])"`).toString().trim().split(' ').map(Number) : [1, 1];
+const swipeInto = new Set([...(S.clock ? [] : ['s0']), ...(S.swipes || [])]);
 const cuts = tim.filter(([key]) => swipeInto.has(key)).map(([, a]) => a);
 
 function drawForm(f, t, dur) {
@@ -22,6 +24,21 @@ function drawForm(f, t, dur) {
   f.add('</g>');
 }
 
+function drawClock(f, t) {
+  // Tax in 60 countdown: stopwatch in the bottom-left counts 60 -> 0 across the whole video (export clock: true)
+  const cx = 200, cy = 1420, R = 78, sc = ob(k(t, 0.2, 0.55));
+  if (sc <= 0) return;
+  const left = Math.max(0, 1 - t / TOTAL), secs = Math.ceil(60 * left);
+  const a0 = -Math.PI / 2, a1 = a0 + 2 * Math.PI * left;
+  const arc = (a, b) => { const large = b - a > Math.PI ? 1 : 0; return `M${cx + R * Math.cos(a)} ${cy + R * Math.sin(a)} A${R} ${R} 0 ${large} 1 ${cx + R * Math.cos(b)} ${cy + R * Math.sin(b)}`; };
+  f.add(`<g transform="translate(${cx} ${cy}) scale(${sc}) translate(${-cx} ${-cy})">`);
+  f.add(`<circle cx="${cx}" cy="${cy}" r="${R + 22}" fill="#0E1014" opacity="0.85"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#2A2F37" stroke-width="14"/>`);
+  if (left > 0.002) f.add(`<path d="${arc(a0, a1 - 0.0001)}" fill="none" stroke="${OR}" stroke-width="14" stroke-linecap="round"/>`);
+  f.add(`<rect x="${cx - 14}" y="${cy - R - 44}" width="28" height="20" rx="6" fill="${OR}"/><rect x="${cx - 26}" y="${cy - R - 56}" width="52" height="14" rx="6" fill="${OR}"/>`);
+  f.add('</g>');
+  f.text(cx, cy, String(secs), 74 * sc, { c: secs <= 5 ? E.RED : E.INK });
+}
+
 function frameAt(t) {
   let i = tim.findIndex(([, a, b]) => t >= a && t < b); if (i < 0) i = tim.length - 1;
   const [key, a, b] = tim[i]; const lt = t - a, dur = b - a;
@@ -29,7 +46,7 @@ function frameAt(t) {
   if (key === 'form') drawForm(f, lt, dur);
   else if (S.scenes[key]) S.scenes[key](f, lt, dur);
   else f.text(540, 900, `missing scene ${key}`, 60, { c: OR });
-  f.body = f.parts.join(''); f.parts = []; f.t = t; for (const c of cuts) f.swipe(c); f.overlay = f.parts.join('');
+  f.body = f.parts.join(''); f.parts = []; f.t = t; for (const c of cuts) f.swipe(c); if (S.clock) drawClock(f, t); f.overlay = f.parts.join('');
   return renderPNG(f.svg(f.cam));
 }
 

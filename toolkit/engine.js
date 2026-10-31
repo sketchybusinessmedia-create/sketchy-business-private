@@ -7,11 +7,17 @@ const { Resvg } = require('@resvg/resvg-js');
 const ICONS = require('@iconify-json/fluent-emoji-flat/icons.json');
 
 const W = 1080, H = 1920, FPS = 30;
-const INK = '#161616', OR = '#FF7A00', HL = '#FFB15C', PAPERC = '#FAF7F0', GREY = '#6b6b6b';
+// THEMES: set SB_THEME=tax60 before requiring the engine for the Tax in 60 look (dark slate, white ink, green accent).
+const THEMES = {
+  sketchbook: { INK: '#161616', OR: '#FF7A00', HL: '#FFB15C', HLOP: 0.75, PAPERC: '#FAF7F0', GREY: '#6b6b6b', RED: '#E5484D', bg: 'paper.png' },
+  tax60: { INK: '#F3F5F8', OR: '#2ED67B', HL: '#2ED67B', HLOP: 0.42, PAPERC: '#15181D', GREY: '#9AA3AE', RED: '#FF5C5C', bg: 'slate.png' },
+};
+const THEME = process.env.SB_THEME && THEMES[process.env.SB_THEME] ? process.env.SB_THEME : 'sketchbook';
+const { INK, OR, HL, HLOP, PAPERC, GREY, RED } = THEMES[THEME];
 const FONT = { marker: 'Permanent Marker', hand: 'Kalam' };
 const ld = p => { const b = fs.readFileSync(__dirname + p); return opentype.parse(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)); };
 const OT = { marker: ld('/fonts/PermanentMarker.ttf'), hand: ld('/fonts/Kalam-Bold.ttf') };
-const PAPER = 'data:image/png;base64,' + fs.readFileSync(__dirname + '/paper.png').toString('base64');
+const PAPER = 'data:image/png;base64,' + fs.readFileSync(__dirname + '/' + THEMES[THEME].bg).toString('base64');
 const gen = rough.generator();
 
 // easing
@@ -73,7 +79,7 @@ class Frame {
     const tw = this.width(s, sz, font);
     if (o.hl) { // highlighter swipe behind text
       const hp = o.hl; const x0 = anchor === 'middle' ? x - tw / 2 : x; const hx = x0 - 18, hw = (tw + 36) * hp;
-      if (hp > 0) this.add(`<g transform="translate(${x} ${y}) scale(${sc}) rotate(${rot}) translate(${-x} ${-y})"><path d="M${hx} ${y - sz * 0.05} q ${hw / 2} ${-sz * 0.06} ${hw} ${sz * 0.02} l 6 ${sz * 0.42} q ${-hw / 2} ${sz * 0.07} ${-hw - 4} ${-sz * 0.02} z" fill="${o.hlc ?? HL}" opacity="0.75"/></g>`);
+      if (hp > 0) this.add(`<g transform="translate(${x} ${y}) scale(${sc}) rotate(${rot}) translate(${-x} ${-y})"><path d="M${hx} ${y - sz * 0.05} q ${hw / 2} ${-sz * 0.06} ${hw} ${sz * 0.02} l 6 ${sz * 0.42} q ${-hw / 2} ${sz * 0.07} ${-hw - 4} ${-sz * 0.02} z" fill="${o.hlc ?? HL}" opacity="${HLOP}"/></g>`);
     }
     const fill = o.c ?? INK; const op = o.alpha ?? 1;
     this.add(`<g transform="translate(${x} ${y}) scale(${sc}) rotate(${rot}) translate(${-x} ${-y})" opacity="${op}"><text x="${x}" y="${y + sz * 0.36}" font-family="${FONT[font]}" font-size="${sz}" text-anchor="${anchor}" fill="${fill}"${o.stroke ? ` stroke="${o.stroke}" stroke-width="${o.sw ?? 10}" paint-order="stroke" stroke-linejoin="round"` : ''}>${esc(s)}</text></g>`);
@@ -140,4 +146,4 @@ function renderPNG(svg) {
   return new Resvg(svg, { fitTo: { mode: 'width', value: W }, font: { fontFiles: [__dirname + '/fonts/PermanentMarker.ttf', __dirname + '/fonts/Kalam-Bold.ttf', __dirname + '/fonts/CaveatBrush.ttf'], loadSystemFonts: false, defaultFontFamily: 'Kalam' } }).render().asPng();
 }
 
-module.exports = { Frame, renderPNG, W, H, FPS, INK, OR, HL, PAPERC, GREY, cl, k, oc, ob, io, lerp };
+module.exports = { Frame, renderPNG, W, H, FPS, INK, OR, HL, PAPERC, GREY, RED, THEME, cl, k, oc, ob, io, lerp };
