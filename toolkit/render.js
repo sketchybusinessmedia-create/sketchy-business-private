@@ -46,7 +46,9 @@ function frameAt(t) {
   if (key === 'form') drawForm(f, lt, dur);
   else if (S.scenes[key]) S.scenes[key](f, lt, dur);
   else f.text(540, 900, `missing scene ${key}`, 60, { c: OR });
-  f.body = f.parts.join(''); f.parts = []; f.t = t; for (const c of cuts) f.swipe(c); if (S.clock) drawClock(f, t); f.overlay = f.parts.join('');
+  f.body = f.parts.join(''); f.parts = []; f.t = t; for (const c of cuts) f.swipe(c); if (S.clock) drawClock(f, t);
+  if (S.footer && i === tim.length - 1) { const o = k(lt, 0.3, 0.8); if (o > 0) f.add(`<g opacity="${o.toFixed(3)}">`), f.text(540, 1800, S.footer, 40, { font: 'hand', c: E.GREY }), f.add('</g>'); }
+  f.overlay = f.parts.join('');
   return renderPNG(f.svg(f.cam));
 }
 

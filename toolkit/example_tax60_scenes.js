@@ -23,6 +23,7 @@ const bars = (f, t, upto) => { // running fine stack, bottom right
 // scenes ------------------------------------------------------------------
 module.exports = {
   clock: true,
+  footer: 'Not professional advice',   // small line at the very bottom during the last segment (on screen only, never spoken)
   swipes: ['s2', 's7', 's8', 's9', 's11'],
   scenes: {
     hook(f, t) { // "Miss one date... and HMRC can fine you sixteen hundred pound. Even if you owe nothing."
@@ -117,8 +118,6 @@ module.exports = {
       f.pop(540, 560, "THAT'S", 110, 0.02, { rot: -2, c: GREY }); f.pop(540, 720, 'TAX IN 60', 170, 0.2, { rot: -3, c: OR });
       f.pop(540, 880, 'FOLLOW FOR MORE', 84, 1.0, { hl: oc(k(t, 1.2, 1.5)) });
       f.sticker('alarm-clock', 760, 1150, 170, { scale: ob(k(t, 0.4, 0.7)), rot: 8 });
-      f.pop(650, 1360, 'General info, not tax advice.', 36, 0.6, { font: 'hand', c: GREY, maxw: 580 });
-      f.pop(650, 1410, 'Check your situation with an accountant.', 36, 0.7, { font: 'hand', c: GREY, maxw: 580 });
     },
   },
   sfx: {
